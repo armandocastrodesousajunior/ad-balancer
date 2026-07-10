@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+build
+.git
+.gitignore
+*.tsbuildinfo
+next-env.d.ts
+prisma/dev.db
+prisma/*.db-journal
+.env
+.env.*
+!.env.example
+.DS_Store
+README.md
+AGENTS.md
+CLAUDE.md

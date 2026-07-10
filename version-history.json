@@ -1,0 +1,16 @@
+﻿{
+    "dockerAccount":  "armandocastro",
+    "history":  [
+                    {
+                        "date":  "2026-07-09T22:21:59",
+                        "version":  "0.1.0",
+                        "type":  "initial"
+                    },
+                    {
+                        "date":  "2026-07-09T22:25:22",
+                        "version":  "0.1.1",
+                        "type":  "bugfix"
+                    }
+                ],
+    "latest":  "0.1.1"
+}

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: adbalancer-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: balancer
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: adbalancer_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    image: armandocastro/ad-balancer:latest
+    container_name: adbalancer-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - SERVICE_URL_AD_3000
+      - DATABASE_URL=postgresql://balancer:secretpassword@db:5432/adbalancer_db?schema=public
+      - ADMIN_TOKEN=sua_senha_super_secreta_aqui
+
+volumes:
+  postgres_data:
