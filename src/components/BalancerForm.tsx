@@ -16,9 +16,23 @@ interface BalancerFormProps {
     id: string
     name: string
     slug: string
+    metaPixelId?: string | null
+    metaPixelEvent?: string | null
     destinations: Destination[]
   }
 }
+
+const META_EVENTS = [
+  'PageView',
+  'Purchase',
+  'Lead',
+  'AddToCart',
+  'InitiateCheckout',
+  'CompleteRegistration',
+  'Contact',
+  'Schedule',
+  'ViewContent'
+]
 
 export default function BalancerForm({ initialData }: BalancerFormProps) {
   const router = useRouter()
@@ -26,6 +40,8 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
 
   const [name, setName] = useState(initialData?.name || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
+  const [metaPixelId, setMetaPixelId] = useState(initialData?.metaPixelId || '')
+  const [metaPixelEvent, setMetaPixelEvent] = useState(initialData?.metaPixelEvent || 'PageView')
   const [destinations, setDestinations] = useState<Destination[]>(
     initialData?.destinations || [
       { id: '1', url: '', weight: 50 },
@@ -85,20 +101,18 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
     const otherIndices = newDests
       .map((_, i) => i)
       .filter(i => i !== index)
-      .sort((a, b) => newDests[b].weight - newDests[a].weight) // Reduce from largest first
+      .sort((a, b) => newDests[b].weight - newDests[a].weight)
 
     for (const i of otherIndices) {
       if (remainingDiff === 0) break
       
       const current = newDests[i].weight
       if (remainingDiff > 0) {
-        // We increased the main slider, need to decrease others
-        const maxDecrease = current // can't go below 0
+        const maxDecrease = current
         const decrease = Math.min(remainingDiff, maxDecrease)
         newDests[i].weight -= decrease
         remainingDiff -= decrease
       } else {
-        // We decreased main slider, need to increase others
         const maxIncrease = 100 - current
         const increase = Math.min(Math.abs(remainingDiff), maxIncrease)
         newDests[i].weight += increase
@@ -137,6 +151,8 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
     const payload = {
       name,
       slug: slug.replace(/[^a-z0-9-]/g, '').toLowerCase(),
+      metaPixelId: metaPixelId.trim() || null,
+      metaPixelEvent,
       destinations: destinations.map(d => ({ url: d.url, weight: d.weight }))
     }
 
@@ -161,30 +177,62 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
       
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <div className={styles.inputGroup}>
-            <label>Nome da Campanha</label>
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="Ex: Lançamento E-book" 
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Link do Balanceador (URL Final)</label>
-            <div className={styles.slugInput}>
-              <span className={styles.domainPrefix}>seusite.com/</span>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div className={styles.inputGroup}>
+              <label>Nome da Campanha</label>
               <input 
                 type="text" 
-                className={`input-field ${styles.slugField}`} 
-                placeholder="lancamento-ebook" 
-                value={slug}
-                onChange={e => setSlug(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
+                className="input-field" 
+                placeholder="Ex: Lançamento E-book" 
+                value={name}
+                onChange={e => setName(e.target.value)}
                 required
               />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label>Link do Balanceador (URL Final)</label>
+              <div className={styles.slugInput}>
+                <span className={styles.domainPrefix}>seusite.com/</span>
+                <input 
+                  type="text" 
+                  className={`input-field ${styles.slugField}`} 
+                  placeholder="lancamento-ebook" 
+                  value={slug}
+                  onChange={e => setSlug(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ padding: '1.5rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '8px', border: '1px solid var(--surface-border)' }}>
+            <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Rastreamento (Pixel da Meta)</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div className={styles.inputGroup}>
+                <label>ID do Pixel (Opcional)</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="Ex: 123456789012345" 
+                  value={metaPixelId}
+                  onChange={e => setMetaPixelId(e.target.value.replace(/[^0-9]/g, ''))}
+                />
+              </div>
+              <div className={styles.inputGroup}>
+                <label>Evento de Disparo</label>
+                <select 
+                  className="input-field"
+                  value={metaPixelEvent}
+                  onChange={e => setMetaPixelEvent(e.target.value)}
+                  disabled={!metaPixelId}
+                >
+                  {META_EVENTS.map(ev => (
+                    <option key={ev} value={ev} style={{ color: '#000' }}>{ev}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

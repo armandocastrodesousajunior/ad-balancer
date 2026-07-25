@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import styles from '../../reports.module.css'
+import ReferrerChart from '@/components/ReferrerChart'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,43 @@ export default async function ReportsPage({ params }: { params: Promise<{ id: st
 
   const totalClicks = balancer._count.accessLogs
 
+  // Agrupar e contar as origens de todo o histórico do balanceador
+  const groupedReferrers = await prisma.accessLog.groupBy({
+    by: ['referrer'],
+    where: { balancerId: id },
+    _count: { referrer: true }
+  })
+
+  // Format the referrer data
+  const referrerData = groupedReferrers
+    .map(g => {
+      let refName = g.referrer || 'Acesso Direto / Desconhecido'
+      // If it's a full URL, try to extract just the hostname to group nicely
+      if (refName.startsWith('http')) {
+        try {
+          const url = new URL(refName)
+          refName = url.hostname
+        } catch {
+          // ignore parsing error
+        }
+      }
+      return {
+        referrer: refName,
+        count: g._count.referrer
+      }
+    })
+    // Group identical hostnames together (since some could be http vs https)
+    .reduce((acc, curr) => {
+      const existing = acc.find(item => item.referrer === curr.referrer)
+      if (existing) {
+        existing.count += curr.count
+      } else {
+        acc.push(curr)
+      }
+      return acc
+    }, [] as { referrer: string, count: number }[])
+    .sort((a, b) => b.count - a.count)
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -49,35 +87,54 @@ export default async function ReportsPage({ params }: { params: Promise<{ id: st
           <h3>Total de Cliques</h3>
           <span className={styles.statValue}>{totalClicks}</span>
         </div>
+        {/* We can add more stat cards here later if needed */}
       </div>
 
-      <div className={styles.distributionSection}>
-        <h3>Distribuição de Tráfego</h3>
-        <div className={styles.destList}>
-          {balancer.destinations.map((dest: any) => {
-            const clicks = dest._count.accessLogs
-            const actualPercentage = totalClicks > 0 ? ((clicks / totalClicks) * 100).toFixed(1) : '0.0'
-            const targetPercentage = dest.weight
-            
-            return (
-              <div key={dest.id} className={`glass ${styles.destRow}`}>
-                <div className={styles.destInfo}>
-                  <span className={styles.destUrl}>{dest.url}</span>
-                  <div className={styles.destMeta}>
-                    <span>Alvo: {targetPercentage}%</span>
-                    <span>Real: {actualPercentage}%</span>
-                    <span>Cliques: {clicks}</span>
+      <div className={styles.grid2Cols}>
+        <div className={styles.distributionSection}>
+          <h3>Distribuição de Tráfego</h3>
+          <div className={styles.destList}>
+            {balancer.destinations.map((dest: any) => {
+              const clicks = dest._count.accessLogs
+              const actualPercentage = totalClicks > 0 ? ((clicks / totalClicks) * 100).toFixed(1) : '0.0'
+              const targetPercentage = dest.weight
+              
+              return (
+                <div key={dest.id} className={`glass ${styles.destRow}`}>
+                  <div className={styles.destInfo}>
+                    <span className={styles.destUrl}>{dest.url}</span>
+                    <div className={styles.destMeta}>
+                      <span>Alvo: {targetPercentage}%</span>
+                      <span>Real: {actualPercentage}%</span>
+                      <span>Cliques: {clicks}</span>
+                    </div>
+                  </div>
+                  <div className={styles.progressBarContainer}>
+                    <div 
+                      className={styles.progressBar} 
+                      style={{ width: `${actualPercentage}%` }}
+                    ></div>
                   </div>
                 </div>
-                <div className={styles.progressBarContainer}>
-                  <div 
-                    className={styles.progressBar} 
-                    style={{ width: `${actualPercentage}%` }}
-                  ></div>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className={styles.originsSection}>
+          <h3>Origem dos Leads</h3>
+          <div className={`glass ${styles.chartContainer}`}>
+            <ReferrerChart data={referrerData} />
+            
+            <div className={styles.originsList}>
+              {referrerData.map((item, i) => (
+                <div key={i} className={styles.originItem}>
+                  <span className={styles.originName}>{item.referrer}</span>
+                  <span className={styles.originCount}>{item.count} cliques</span>
                 </div>
-              </div>
-            )
-          })}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

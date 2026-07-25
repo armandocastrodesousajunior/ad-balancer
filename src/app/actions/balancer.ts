@@ -8,7 +8,15 @@ interface DestinationInput {
   weight: number
 }
 
-export async function createBalancer(data: { name: string, slug: string, destinations: DestinationInput[] }) {
+interface BalancerInput {
+  name: string
+  slug: string
+  destinations: DestinationInput[]
+  metaPixelId?: string | null
+  metaPixelEvent?: string | null
+}
+
+export async function createBalancer(data: BalancerInput) {
   try {
     // Check if slug exists
     const existing = await prisma.balancer.findUnique({
@@ -23,6 +31,8 @@ export async function createBalancer(data: { name: string, slug: string, destina
       data: {
         name: data.name,
         slug: data.slug,
+        metaPixelId: data.metaPixelId || null,
+        metaPixelEvent: data.metaPixelEvent || 'PageView',
         destinations: {
           create: data.destinations.map(d => ({
             url: d.url,
@@ -40,7 +50,7 @@ export async function createBalancer(data: { name: string, slug: string, destina
   }
 }
 
-export async function updateBalancer(id: string, data: { name: string, slug: string, destinations: DestinationInput[] }) {
+export async function updateBalancer(id: string, data: BalancerInput) {
   try {
     // Se o slug for alterado, verificar se já não existe outro com esse slug
     const existing = await prisma.balancer.findUnique({
@@ -61,6 +71,8 @@ export async function updateBalancer(id: string, data: { name: string, slug: str
       data: {
         name: data.name,
         slug: data.slug,
+        metaPixelId: data.metaPixelId || null,
+        metaPixelEvent: data.metaPixelEvent || 'PageView',
         destinations: {
           create: data.destinations.map(d => ({
             url: d.url,

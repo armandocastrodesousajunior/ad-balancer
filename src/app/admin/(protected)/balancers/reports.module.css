@@ -115,6 +115,75 @@
   max-width: 150px;
 }
 
+.grid2Cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .grid2Cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.originsSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.chartContainer {
+  padding: 1.5rem;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.originsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.originsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.originsList::-webkit-scrollbar-thumb {
+  background: var(--surface-border);
+  border-radius: 4px;
+}
+
+.originItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-border);
+}
+
+.originName {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--foreground);
+}
+
+.originCount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

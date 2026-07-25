@@ -10,7 +10,22 @@
                         "date":  "2026-07-09T22:25:22",
                         "version":  "0.1.1",
                         "type":  "bugfix"
+                    },
+                    {
+                        "date":  "2026-07-09T22:39:11",
+                        "version":  "0.1.2",
+                        "type":  "bugfix"
+                    },
+                    {
+                        "date":  "2026-07-23T11:13:55",
+                        "version":  "0.2.0",
+                        "type":  "feature"
+                    },
+                    {
+                        "date":  "2026-07-24T21:18:11",
+                        "version":  "0.3.0",
+                        "type":  "feature"
                     }
                 ],
-    "latest":  "0.1.1"
+    "latest":  "0.3.0"
 }

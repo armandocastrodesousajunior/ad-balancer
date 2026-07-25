@@ -11,8 +11,10 @@ model Balancer {
   id          String        @id @default(uuid())
   name        String
   slug        String        @unique
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  metaPixelId    String?
+  metaPixelEvent String?       @default("PageView")
 
   destinations Destination[]
   accessLogs   AccessLog[]
