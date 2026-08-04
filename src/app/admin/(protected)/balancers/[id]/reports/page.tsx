@@ -97,7 +97,8 @@ export default async function ReportsPage({ params }: { params: Promise<{ id: st
             {balancer.destinations.map((dest: any) => {
               const clicks = dest._count.accessLogs
               const actualPercentage = totalClicks > 0 ? ((clicks / totalClicks) * 100).toFixed(1) : '0.0'
-              const targetPercentage = dest.weight
+              const allWeights = balancer.destinations.reduce((sum: number, d: any) => sum + d.weight, 0)
+              const targetPercentage = allWeights > 0 ? ((dest.weight / allWeights) * 100).toFixed(1) : '0.0'
               
               return (
                 <div key={dest.id} className={`glass ${styles.destRow}`}>

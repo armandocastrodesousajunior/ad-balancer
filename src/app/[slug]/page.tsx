@@ -26,8 +26,9 @@ export default async function RedirectPage({ params }: { params: Promise<{ slug:
     notFound()
   }
 
-  // Lógica de seleção ponderada (weighted random)
-  const randomNum = Math.random() * 100
+  // Lógica de seleção ponderada (weighted random com pesos relativos)
+  const totalWeight = balancer.destinations.reduce((sum, d) => sum + d.weight, 0)
+  const randomNum = Math.random() * totalWeight
   let runningSum = 0
   let selectedDestination = balancer.destinations[balancer.destinations.length - 1] // Fallback
 
