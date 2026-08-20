@@ -18,6 +18,8 @@ interface BalancerFormProps {
     slug: string
     metaPixelId?: string | null
     metaPixelEvent?: string | null
+    metaTitle?: string | null
+    metaDescription?: string | null
     destinations: Destination[]
   }
 }
@@ -40,6 +42,10 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
 
   const [name, setName] = useState(initialData?.name || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
+  
+  const [metaTitle, setMetaTitle] = useState(initialData?.metaTitle || '')
+  const [metaDescription, setMetaDescription] = useState(initialData?.metaDescription || '')
+
   const [metaPixelId, setMetaPixelId] = useState(initialData?.metaPixelId || '')
   const [metaPixelEvent, setMetaPixelEvent] = useState(initialData?.metaPixelEvent || 'PageView')
   const [destinations, setDestinations] = useState<Destination[]>(
@@ -101,6 +107,8 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
     const payload = {
       name,
       slug: slug.replace(/[^a-z0-9-]/g, '').toLowerCase(),
+      metaTitle: metaTitle.trim() || null,
+      metaDescription: metaDescription.trim() || null,
       metaPixelId: metaPixelId.trim() || null,
       metaPixelEvent,
       destinations: destinations.map(d => ({ url: d.url, weight: d.weight }))
@@ -152,6 +160,32 @@ export default function BalancerForm({ initialData }: BalancerFormProps) {
                   value={slug}
                   onChange={e => setSlug(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
                   required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ padding: '1.5rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '8px', border: '1px solid var(--surface-border)' }}>
+            <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Aparência do Link (Opcional)</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div className={styles.inputGroup}>
+                <label>Título do Link (Aparece no WhatsApp, Navegador, etc)</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="Ex: Oferta Exclusiva - Meu Produto" 
+                  value={metaTitle}
+                  onChange={e => setMetaTitle(e.target.value)}
+                />
+              </div>
+              <div className={styles.inputGroup}>
+                <label>Descrição do Link</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="Ex: Clique aqui e aproveite a promoção imperdível válida somente hoje!" 
+                  value={metaDescription}
+                  onChange={e => setMetaDescription(e.target.value)}
                 />
               </div>
             </div>

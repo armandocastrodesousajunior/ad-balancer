@@ -24,6 +24,8 @@ export default async function EditBalancerPage({ params }: { params: Promise<{ i
     slug: balancer.slug,
     metaPixelId: balancer.metaPixelId,
     metaPixelEvent: balancer.metaPixelEvent,
+    metaTitle: balancer.metaTitle,
+    metaDescription: balancer.metaDescription,
     destinations: balancer.destinations.map(d => ({
       id: d.id,
       url: d.url,

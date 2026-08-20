@@ -14,6 +14,8 @@ interface BalancerInput {
   destinations: DestinationInput[]
   metaPixelId?: string | null
   metaPixelEvent?: string | null
+  metaTitle?: string | null
+  metaDescription?: string | null
 }
 
 export async function createBalancer(data: BalancerInput) {
@@ -33,6 +35,8 @@ export async function createBalancer(data: BalancerInput) {
         slug: data.slug,
         metaPixelId: data.metaPixelId || null,
         metaPixelEvent: data.metaPixelEvent || 'PageView',
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
         destinations: {
           create: data.destinations.map(d => ({
             url: d.url,
@@ -73,6 +77,8 @@ export async function updateBalancer(id: string, data: BalancerInput) {
         slug: data.slug,
         metaPixelId: data.metaPixelId || null,
         metaPixelEvent: data.metaPixelEvent || 'PageView',
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
         destinations: {
           create: data.destinations.map(d => ({
             url: d.url,
